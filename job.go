@@ -54,21 +54,21 @@ func (j *Job) shouldRun() bool {
 
 //Run the job and immediately reschedule it
 func (j *Job) run() (result []reflect.Value, err error) {
-	runable := true
 	if j.lock {
 		if locker == nil {
 			return nil, fmt.Errorf("trying to lock %s with nil locker", j.jobFunc)
 		}
 		key := getFunctionKey(j.jobFunc)
 
-		runable, _ = locker.Lock(key)
+		runable, _ := locker.Lock(key)
+		if !runable {
+			return
+		}
 		defer locker.Unlock(key)
 	}
-	if runable {
-		result, err = callJobFuncWithParams(j.funcs[j.jobFunc], j.fparams[j.jobFunc])
-		if err != nil {
-			return nil, err
-		}
+	result, err = callJobFuncWithParams(j.funcs[j.jobFunc], j.fparams[j.jobFunc])
+	if err != nil {
+		return nil, err
 	}
 	return
 }
