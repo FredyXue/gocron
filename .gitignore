@@ -21,6 +21,7 @@ _testmain.go
 
 *.exe
 *.test
+go.sum
 
 # IDE project files
 .idea
